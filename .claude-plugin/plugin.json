@@ -1,0 +1,12 @@
+{
+  "name": "testspec",
+  "version": "0.1.0",
+  "description": "TestSpec 测试用例设计工具集：需求分析、测试点提炼、用例生成",
+  "author": {
+    "name": "winhok"
+  },
+  "homepage": "https://github.com/winhok/testspec",
+  "repository": "https://github.com/winhok/testspec",
+  "license": "MIT",
+  "keywords": ["testspec", "testing", "test-cases", "test-design", "qa"]
+}

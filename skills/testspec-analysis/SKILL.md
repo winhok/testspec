@@ -13,7 +13,7 @@ description: TestSpec 需求分析和梳理 - 生成或更新 requirements-analy
 
 ## 当前变更目录
 
-参见 `.claude/skills/testspec-shared/common.md` 中的「当前变更目录定位规则」。
+参见 `../testspec-shared/common.md` 中的「当前变更目录定位规则」。
 
 ## 执行步骤
 
@@ -159,7 +159,7 @@ description: TestSpec 需求分析和梳理 - 生成或更新 requirements-analy
 - [ ] <需与产品/开发确认的问题>
 ```
 
-完整模板见 `.claude/skills/testspec-shared/artifact-templates.md`。
+完整模板见 `../testspec-shared/artifact-templates.md`。
 
 4. **告知用户**：文件路径及下一步可执行 testspec-points 提炼测试要点。
 

@@ -11,7 +11,7 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
 
 ## 当前变更目录
 
-参见 `.claude/skills/testspec-shared/common.md` 中的「当前变更目录定位规则」。
+参见 `../testspec-shared/common.md` 中的「当前变更目录定位规则」。
 
 ---
 
@@ -269,11 +269,11 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
 5. **调用生成脚本**：
    - **Excel**：执行
      ```bash
-     python .claude/skills/testspec-generate/scripts/generate_excel.py --input <变更目录>/testcases.json --output <变更目录>/artifacts/<name>_cases.xlsx
+     python ./scripts/generate_excel.py --input <变更目录>/testcases.json --output <变更目录>/artifacts/<name>_cases.xlsx
      ```
    - **XMind**：执行
      ```bash
-     python .claude/skills/testspec-generate/scripts/generate_xmind.py --input <变更目录>/testcases.json --output <变更目录>/artifacts/<name>_cases.xmind --title "测试用例"
+     python ./scripts/generate_xmind.py --input <变更目录>/testcases.json --output <变更目录>/artifacts/<name>_cases.xmind --title "测试用例"
      ```
 6. **清理**：可删除临时 testcases.json，或保留供用户审查。
 7. **告知用户**：列出生成的文件路径及简要说明。
