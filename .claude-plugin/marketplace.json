@@ -1,0 +1,37 @@
+[
+  {
+    "name": "testspec-new",
+    "source": "./testspec-new",
+    "description": "新建测试工作，创建变更目录和测试提案（proposal.md）",
+    "strict": false,
+    "skills": ["./"]
+  },
+  {
+    "name": "testspec-analysis",
+    "source": "./testspec-analysis",
+    "description": "需求深度分析，识别测试风险和边界，产出 requirements-analysis.md",
+    "strict": false,
+    "skills": ["./"]
+  },
+  {
+    "name": "testspec-points",
+    "source": "./testspec-points",
+    "description": "从分析结论中提炼测试点清单（specs/testpoints.md）",
+    "strict": false,
+    "skills": ["./"]
+  },
+  {
+    "name": "testspec-generate",
+    "source": "./testspec-generate",
+    "description": "根据测试点生成完整测试用例，导出 Excel 或 XMind",
+    "strict": false,
+    "skills": ["./"]
+  },
+  {
+    "name": "testspec-shared",
+    "source": "./testspec-shared",
+    "description": "TestSpec 公共约定、模板和流程定义（被其他 skill 引用）",
+    "strict": false,
+    "skills": ["./"]
+  }
+]
