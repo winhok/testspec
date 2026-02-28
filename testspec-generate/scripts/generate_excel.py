@@ -25,7 +25,18 @@ def create_excel_with_openpyxl(test_cases: list, output_path: str) -> None:
     sheet = wb.active
     sheet.title = "测试用例"
 
-    headers = ["用例编号", "用例名称", "功能模块", "类型", "前置条件", "测试步骤", "预期结果", "优先级", "执行结果"]
+    headers = [
+        "编号",
+        "用例标题",
+        "级别",
+        "预置条件",
+        "操作步骤",
+        "测试预期内容",
+        "执行结果",
+        "执行人",
+        "执行日期",
+        "备注",
+    ]
     header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF", size=11)
 
@@ -36,28 +47,28 @@ def create_excel_with_openpyxl(test_cases: list, output_path: str) -> None:
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center", vertical="center")
 
-    column_widths = [12, 35, 12, 10, 25, 40, 30, 10, 12]
+    column_widths = [18, 45, 8, 25, 40, 35, 12, 10, 14, 20]
     for col_idx, width in enumerate(column_widths, 1):
         sheet.column_dimensions[get_column_letter(col_idx)].width = width
 
     for row_idx, tc in enumerate(test_cases, 2):
-        tc_id = f"TC-{row_idx - 1:03d}"
-        name = tc.get("name", "")
-        feature = tc.get("feature", "")
-        tc_type = tc.get("type", "")
+        tc_id = tc.get("id") or tc.get("case_id") or f"TC-{row_idx - 1:03d}"
+        title = tc.get("title") or tc.get("name", "")
+        priority = tc.get("priority", "P1")
         preconditions = tc.get("preconditions", "")
         steps = tc.get("steps", "")
         expected = tc.get("expected_result", tc.get("expected", ""))
-        priority = tc.get("priority", "P1")
+
         sheet.cell(row=row_idx, column=1, value=tc_id)
-        sheet.cell(row=row_idx, column=2, value=name)
-        sheet.cell(row=row_idx, column=3, value=feature)
-        sheet.cell(row=row_idx, column=4, value=tc_type)
-        sheet.cell(row=row_idx, column=5, value=preconditions)
-        sheet.cell(row=row_idx, column=6, value=steps)
-        sheet.cell(row=row_idx, column=7, value=expected)
-        sheet.cell(row=row_idx, column=8, value=priority)
+        sheet.cell(row=row_idx, column=2, value=title)
+        sheet.cell(row=row_idx, column=3, value=priority)
+        sheet.cell(row=row_idx, column=4, value=preconditions)
+        sheet.cell(row=row_idx, column=5, value=steps)
+        sheet.cell(row=row_idx, column=6, value=expected)
+        sheet.cell(row=row_idx, column=7, value="")
+        sheet.cell(row=row_idx, column=8, value="")
         sheet.cell(row=row_idx, column=9, value="")
+        sheet.cell(row=row_idx, column=10, value="")
 
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     wb.save(output_path)

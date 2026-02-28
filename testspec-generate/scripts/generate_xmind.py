@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional
 NS = "urn:xmind:xmap:xmlns:content:2.0"
 
 # 优先级 -> XMind marker（与 xmind_generator 一致）
-PRIORITY_MARKERS = {"P0": "priority-1", "P1": "priority-2", "P2": "priority-3"}
+PRIORITY_MARKERS = {"P0": "priority-1", "P1": "priority-2", "P2": "priority-3", "P3": "priority-4"}
 
 # 测试类型 -> XMind flag marker（正向/负向/边界/异常 对应）
 TYPE_MARKERS = {
@@ -70,7 +70,7 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
                 continue
             type_node = {"title": f"{tc_type}用例", "children": []}
             for tc in cases:
-                name = tc.get("name", "")
+                name = tc.get("title") or tc.get("name", "")
                 preconditions = tc.get("preconditions", "")
                 steps = tc.get("steps", "")
                 expected = tc.get("expected_result", tc.get("expected", ""))
@@ -81,6 +81,7 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
                         "preconditions": preconditions,
                         "test_steps": steps,
                         "expected_result": expected,
+                        "priority": priority,
                     }
                 markers = _generate_markers(tc_type, priority)
                 if markers:
@@ -91,7 +92,7 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
             if tc_type not in type_order:
                 type_node = {"title": f"{tc_type}用例", "children": []}
                 for tc in cases:
-                    name = tc.get("name", "")
+                    name = tc.get("title") or tc.get("name", "")
                     preconditions = tc.get("preconditions", "")
                     steps = tc.get("steps", "")
                     expected = tc.get("expected_result", tc.get("expected", ""))
@@ -102,13 +103,15 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
                             "preconditions": preconditions,
                             "test_steps": steps,
                             "expected_result": expected,
+                            "priority": priority,
                         }
                     if priority or tc_type:
                         node["markers"] = _generate_markers(tc_type, priority)
                     type_node["children"].append(node)
                 feat_node["children"].append(type_node)
         root_children.append(feat_node)
-    return [{"title": root_title, "children": root_children}]
+    grouping_node = {"title": root_title, "children": root_children}
+    return [{"title": root_title, "children": [grouping_node]}]
 
 
 def _create_topic_xml(
@@ -143,19 +146,27 @@ def _create_topic_xml(
     if fields:
         if not children:
             children = []
-        field_order = [
-            ("preconditions", "前置条件"),
-            ("test_steps", "测试步骤"),
-            ("expected_result", "预期结果"),
-        ]
+        priority = fields.get("priority", "P1")
+        expected_val = fields.get("expected_result", "")
+        steps_val = fields.get("test_steps", "")
+        precond_val = fields.get("preconditions", "")
+
         current_node = None
-        for field_key, field_label in reversed(field_order):
-            if field_key in fields and fields[field_key]:
-                field_value = fields[field_key]
-                current_node = {
-                    "title": f"{field_label}: {field_value}",
-                    "children": [current_node] if current_node else [],
-                }
+        if expected_val:
+            current_node = {
+                "title": f"期望结果：{expected_val}",
+                "children": [],
+            }
+        if steps_val:
+            current_node = {
+                "title": f"{priority}操作步骤：{steps_val}",
+                "children": [current_node] if current_node else [],
+            }
+        if precond_val:
+            current_node = {
+                "title": f"预置条件：{precond_val}",
+                "children": [current_node] if current_node else [],
+            }
         if current_node:
             children = [current_node] + list(children)
 
