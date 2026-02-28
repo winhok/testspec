@@ -151,8 +151,73 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
 
 ## 输出格式
 
-- **Excel**：生成 .xlsx 文件，列头依次为：编号、用例标题、级别、预置条件、操作步骤、测试预期内容、功能模块、类型、执行结果、执行人、执行日期、备注。
+- **Excel**：生成 .xlsx 文件，列头依次为：编号、用例标题、级别、预置条件、操作步骤、测试预期内容、执行结果、执行人、执行日期、备注。
 - **XMind**：生成 .xmind 思维导图（XMind 8 格式，兼容 XMind 桌面版打开），按功能模块组织，叶子节点使用用例标题（优先使用 title，其次 name），包含正向用例、负向用例、边界值用例、异常用例等分类。用例详情节点格式与  一致：`预置条件：xxx` → `{级别}操作步骤：xxx`（如 `P0操作步骤：xxx`）→ `期望结果：xxx`。
+
+### Excel 列头与字段映射（以脚本为准）
+
+> 本节是 **契约**：Excel 的 schema 以 `testspec-generate/scripts/generate_excel.py` 与对应单测为准；文档不得与实现/单测不一致。
+
+#### 工作表
+
+- 工作表名称固定：`测试用例`
+
+#### 列头（固定 10 列）
+
+1. 编号
+2. 用例标题
+3. 级别
+4. 预置条件
+5. 操作步骤
+6. 测试预期内容
+7. 执行结果
+8. 执行人
+9. 执行日期
+10. 备注
+
+#### testcases.json → Excel 字段映射
+
+- **1 编号**：`id` 优先，其次 `case_id`，否则自动生成 `TC-xxx`（生成器兜底）
+- **2 用例标题**：`title` 优先，其次 `name`
+- **3 级别**：`priority`（默认 `P1`）
+- **4 预置条件**：`preconditions`
+- **5 操作步骤**：`steps`
+- **6 测试预期内容**：`expected_result` 优先，其次 `expected`
+- **7～10（执行结果/执行人/执行日期/备注）**：生成器写空字符串，**预留人工填写**
+
+> 说明：当前 Excel schema **不包含**「功能模块」「类型」两列；如需写入这两列，属于**行为变更**（需要同步修改脚本与单测），而非仅调整文档。
+
+### XMind 层级与字段映射（以脚本为准）
+
+> 本节是契约：XMind 的树结构与节点文本以 `testspec-generate/scripts/generate_xmind.py` 与对应单测为准；文档不得与实现不一致。
+
+#### 根节点结构
+
+- Sheet 标题：由 `--title` 指定（默认 `测试用例`）
+- Topic1（根节点）：`--title`
+- Topic2（汇总节点）：`--title`（Topic1 的唯一子节点）
+
+#### 分组层级（固定：feature → type → case）
+
+- 功能模块（第 1 层）：来自 `feature`；缺失默认为 `未分类`；节点标题：`{feature} - 测试用例`
+- 用例类型（第 2 层）：来自 `type`；缺失默认为 `其他`
+  - 已知类型顺序固定：正向 / 负向 / 边界 / 异常 / 其他
+  - 未知类型：追加在后（不保证顺序）
+  - 节点标题：`{type}用例`
+- 用例（叶子节点）：标题 `title` 优先，其次 `name`
+
+#### 用例详情子节点（链式嵌套）
+
+若存在任一字段 `preconditions` / `steps` / `expected_result|expected`，则生成链式子节点（缺失的环节省略）：
+
+`预置条件：{preconditions}` → `{priority}操作步骤：{steps}` → `期望结果：{expected_result|expected}`
+
+#### markers（标记）
+
+- type flag：正向/其他=`flag-blue`，负向/异常=`flag-red`，边界=`flag-yellow`
+- priority：P0=`priority-1`，P1=`priority-2`，P2=`priority-3`，P3=`priority-4`
+
+> 说明：优先级不作为分组层级；(优先级通过 marker 与“{priority}操作步骤”前缀表达）。
 
 可同时生成两种格式，如 testspec-generate Excel,XMind。
 
