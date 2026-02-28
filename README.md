@@ -35,57 +35,27 @@ testspec/changes/<name>/
 
 ## 安装
 
-### Claude Code
-
-通过 Plugin Marketplace：
+### Claude Code（推荐）
 
 ```
 /plugin marketplace add winhok/testspec
-/plugin install testspec-new
-/plugin install testspec-analysis
-/plugin install testspec-points
-/plugin install testspec-generate
-/plugin install /plugin install /plugin install testspec-shared
+/plugin install testspec
 ```
 
-安装后执行 `/exit` 重启 Claude Code 加载新 skills。
+安装后重启 Claude Code 加载新 skills。
 
 ### Cursor
 
-方式一：通过 Settings UI（推荐）
+通过 Settings UI：
 
 1. 打开 Settings（`Cmd+Shift+J` / `Ctrl+Shift+J`）
 2. 进入 Rules → Add Rule → Remote Rule (GitHub)
 3. 输入：`https://github.com/winhok/testspec.git`
 
-方式二：克隆到本地
-
-```bash
-# 项目级（仅当前项目可用）
-git clone git@github.com:winhok/testspec.git .cursor/skills/testspec
-
-# 用户级（所有项目可用）
-git clone git@github.com:winhok/testspec.git ~/.cursor/skills/testspec
-```
-
-在 Agent 聊天中输入 `/` 搜索并调用 skill。
-
 ### Trae
 
-方式一：导入 skill
-
 1. 打开 Settings → Rules & Skills
-2. 导入本仓库中各 skill 目录下的 `SKILL.md` 文件
-
-方式二：克隆到本地
-
-```bash
-# 项目级（仅当前项目可用）
-git clone git@github.com:winhok/testspec.git .trae/skills/testspec
-
-# 全局级（所有项目可用）
-git clone git@github.com:winhok/testspec.git ~/.trae/skills/testspec
-```
+2. 导入本仓库中 `skills/` 下各目录的 `SKILL.md` 文件
 
 ### 手动安装（通用）
 
