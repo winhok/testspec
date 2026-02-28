@@ -296,8 +296,13 @@ def main():
     parser.add_argument("--title", "-t", default="测试用例", help="Root topic / sheet title")
     args = parser.parse_args()
 
-    with open(args.input, encoding="utf-8-sig") as f:
-        test_cases = json.load(f)
+    try:
+        with open(args.input, encoding="utf-8-sig") as f:
+            test_cases = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"错误：{args.input} JSON 格式无效（行 {e.lineno} 列 {e.colno}）。", file=sys.stderr)
+        print("常见原因：字符串值中包含未转义的双引号。请检查并将 \" 转义为 \\\" 或使用「」替代。", file=sys.stderr)
+        sys.exit(1)
 
     if not isinstance(test_cases, list):
         print("错误：JSON 应为用例数组", file=sys.stderr)
