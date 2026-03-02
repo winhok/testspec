@@ -33,6 +33,7 @@ testspec-new → testspec-analysis → testspec-points → testspec-generate
 ### Claude Code（推荐）
 
 ```
+/plugin marketplace add winhok/testkit
 /plugin install testkit
 ```
 
