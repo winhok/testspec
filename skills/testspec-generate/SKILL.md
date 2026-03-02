@@ -7,7 +7,7 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
 
 ## 职责
 
-读取当前变更的 `specs/*.md`（测试点），将测试点展开为完整的测试用例，根据用户指定的格式（Excel 或 XMind）生成测试用例文件，输出到当前变更的 `artifacts/` 目录。若存在 `strategy.md` 可参考其测试类型、层级与通过标准；否则使用默认策略（测试类型以功能为主，类型：正向/负向/边界/异常，优先级 P0/P1/P2/P3，通过标准为用例通过）。不依赖外部技能，使用本技能内置脚本完成生成。
+读取当前变更的 `specs/*.md`（测试点），将测试点展开为完整的测试用例，根据用户指定的格式（Excel 或 XMind）生成测试用例文件，输出到当前变更的 `artifacts/` 目录。若存在 `strategy.md` 可参考其测试类型、层级与通过标准；否则使用默认策略（测试类型以功能为主，类型：冒烟/正向/负向/边界/异常，优先级 P1/P2/P3，通过标准为用例通过）。不依赖外部技能，使用本技能内置脚本完成生成。
 
 ## 当前变更目录
 
@@ -280,7 +280,47 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
    - 类型：冒烟 / 正向 / 负向 / 边界 / 异常
    - 前置条件、步骤、预期结果
    - 优先级：P1 / P2 / P3
-4. **生成 testcases.json**：在变更目录或 artifacts/ 下写入临时 `testcases.json`，供脚本读取。格式示例：
+4. **生成 testcases.json**：
+
+### JSON 写入策略（重要）
+
+为确保 JSON 格式正确且写入成功，按以下优先级执行：
+
+1. **首选方案**：使用 Write 工具写入（确保双引号已转义为 `\"`）
+2. **兜底方案 1**：如果 Write 失败，使用 Bash heredoc：
+   ```bash
+   mkdir -p artifacts
+   cat > "testcases.json" << 'EOF'
+   <完整 JSON 内容>
+   EOF
+   ```
+3. **兜底方案 2**：如果 heredoc 也失败，使用 Python 直接生成：
+   ```bash
+   python3 << 'PYEOF'
+   import json
+   test_cases = [
+       # 在这里直接构造 Python 字典列表，无需手动转义
+       {
+           "id": "登录_202602280001",
+           "title": "登录_凭据验证_正确凭据登录成功",
+           "feature": "登录",
+           "type": "正向",
+           "preconditions": "1、系统已启动\n2、用户已注册",
+           "steps": "1、打开登录页\n2、输入正确账号密码\n3、点击「登录」按钮",
+           "expected_result": "1、登录成功，页面跳转至首页\n2、顶部显示「欢迎回来」提示",
+           "priority": "P1"
+       }
+   ]
+   with open('testcases.json', 'w', encoding='utf-8') as f:
+       json.dump(test_cases, f, ensure_ascii=False, indent=2)
+   PYEOF
+   ```
+4. **验证 JSON 格式**：
+   ```bash
+   python3 -m json.tool testcases.json > /dev/null && echo "✓ JSON 格式正确" || echo "✗ JSON 格式错误，请检查"
+   ```
+
+在变更目录或 artifacts/ 下写入临时 `testcases.json`，供脚本读取。格式示例：
 
    ```json
    [
@@ -368,7 +408,7 @@ description: TestSpec 生成测试用例 - 根据测试点（specs/*.md）生成
 ### 发现问题时的处理
 
 - 覆盖不足：补充缺失用例，编号从现有编号后连续递增
-- 优先级不当：根据 P0 识别标准调整
+- 优先级不当：根据优先级规则和冒烟用例识别标准调整
 - 粒度不当：按拆分/合并原则调整
 - 调整后重新生成 testcases.json 和输出文件
 
