@@ -33,7 +33,7 @@ class TestGenerateExcel(unittest.TestCase):
                     "preconditions": "1、用户已注册",
                     "steps": "1、打开登录页\n2、输入账号密码\n3、点击登录",
                     "expected_result": "1、登录成功并跳转首页",
-                    "priority": "P0",
+                    "priority": "P1",
                 }
             ]
             input_path.write_text(json.dumps(testcases, ensure_ascii=False), encoding="utf-8")
@@ -72,7 +72,7 @@ class TestGenerateExcel(unittest.TestCase):
 
             self.assertEqual(ws.cell(row=2, column=1).value, "需求A_202602280001")
             self.assertEqual(ws.cell(row=2, column=2).value, "登录_凭据验证_正确凭据登录成功")
-            self.assertEqual(ws.cell(row=2, column=3).value, "P0")
+            self.assertEqual(ws.cell(row=2, column=3).value, "P1")
             self.assertIn(ws.cell(row=2, column=7).value, (None, ""))
 
             wb.close()
@@ -93,7 +93,7 @@ class TestGenerateExcel(unittest.TestCase):
                     "preconditions": "1、用户已登录",
                     "steps": "1、进入任务列表\n2、点击「去完成」按钮",
                     "expected_result": '1、按钮文案为「去完成」\n2、跳转至任务详情页',
-                    "priority": "P0",
+                    "priority": "P1",
                 }
             ]
             input_path.write_text(json.dumps(testcases, ensure_ascii=False), encoding="utf-8")

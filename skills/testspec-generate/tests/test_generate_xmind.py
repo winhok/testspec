@@ -29,7 +29,7 @@ class TestGenerateXMind(unittest.TestCase):
                     "title": "登录_凭据验证_正确凭据登录成功",
                     "feature": "登录",
                     "type": "正向",
-                    "priority": "P0",
+                    "priority": "P1",
                     "steps": "1、...",
                     "expected_result": "1、...",
                 }
@@ -54,7 +54,7 @@ class TestGenerateXMind(unittest.TestCase):
                 content = zf.read("content.xml").decode("utf-8")
 
             self.assertIn("登录_凭据验证_正确凭据登录成功", content)
-            self.assertIn("P0操作步骤：", content)
+            self.assertIn("P1操作步骤：", content)
             self.assertIn("期望结果：", content)
 
     def test_xmind_with_quoted_text(self):
@@ -70,7 +70,7 @@ class TestGenerateXMind(unittest.TestCase):
                     "title": "任务_按钮文案_显示去完成",
                     "feature": "任务",
                     "type": "正向",
-                    "priority": "P0",
+                    "priority": "P1",
                     "steps": "1、点击「去完成」按钮",
                     "expected_result": "1、按钮文案为「去完成」",
                 }

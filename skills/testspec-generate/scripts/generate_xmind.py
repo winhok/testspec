@@ -25,10 +25,11 @@ logger = logging.getLogger(__name__)
 NS = "urn:xmind:xmap:xmlns:content:2.0"
 
 # 优先级 -> XMind marker（与 xmind_generator 一致）
-PRIORITY_MARKERS = {"P0": "priority-1", "P1": "priority-2", "P2": "priority-3", "P3": "priority-4"}
+PRIORITY_MARKERS = {"P1": "priority-1", "P2": "priority-2", "P3": "priority-3"}
 
-# 测试类型 -> XMind flag marker（正向/负向/边界/异常 对应）
+# 测试类型 -> XMind flag marker（冒烟/正向/负向/边界/异常 对应）
 TYPE_MARKERS = {
+    "冒烟": "flag-green",
     "正向": "flag-blue",
     "负向": "flag-red",
     "边界": "flag-yellow",
@@ -83,7 +84,7 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
         tc_type = tc.get("type", "其他")
         by_feature[feature][tc_type].append(tc)
 
-    type_order = ["正向", "负向", "边界", "异常", "其他"]
+    type_order = ["冒烟", "正向", "负向", "边界", "异常", "其他"]
     root_children = []
     for feature in sorted(by_feature.keys()):
         feat_node = {"title": f"{feature} - 测试用例", "children": []}
