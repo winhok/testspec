@@ -10,6 +10,7 @@ TestSpec XMind 用例生成脚本：根据 testcases.json 生成 .xmind 测试�
 """
 import argparse
 import json
+import logging
 import os
 import sys
 import time
@@ -19,6 +20,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
+logger = logging.getLogger(__name__)
 
 NS = "urn:xmind:xmap:xmlns:content:2.0"
 
@@ -49,6 +51,27 @@ def _generate_markers(tc_type: str, priority: str) -> List[str]:
     return markers
 
 
+def _build_case_node(tc: Dict[str, Any], tc_type: str) -> Dict[str, Any]:
+    """构建单个测试用例节点，包含 fields 和 markers。"""
+    name = tc.get("title") or tc.get("name", "")
+    preconditions = tc.get("preconditions", "")
+    steps = tc.get("steps", "")
+    expected = tc.get("expected_result", tc.get("expected", ""))
+    priority = tc.get("priority", "")
+    node: Dict[str, Any] = {"title": name, "children": []}
+    if preconditions or steps or expected:
+        node["fields"] = {
+            "preconditions": preconditions,
+            "test_steps": steps,
+            "expected_result": expected,
+            "priority": priority,
+        }
+    markers = _generate_markers(tc_type, priority)
+    if markers:
+        node["markers"] = markers
+    return node
+
+
 def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, Any]]:
     """
     将 testcases.json 的扁平用例列表组织为 XMind 层级结构。
@@ -70,44 +93,13 @@ def build_xmind_structure(test_cases: list, root_title: str) -> List[Dict[str, A
                 continue
             type_node = {"title": f"{tc_type}用例", "children": []}
             for tc in cases:
-                name = tc.get("title") or tc.get("name", "")
-                preconditions = tc.get("preconditions", "")
-                steps = tc.get("steps", "")
-                expected = tc.get("expected_result", tc.get("expected", ""))
-                priority = tc.get("priority", "")
-                node = {"title": name, "children": []}
-                if preconditions or steps or expected:
-                    node["fields"] = {
-                        "preconditions": preconditions,
-                        "test_steps": steps,
-                        "expected_result": expected,
-                        "priority": priority,
-                    }
-                markers = _generate_markers(tc_type, priority)
-                if markers:
-                    node["markers"] = markers
-                type_node["children"].append(node)
+                type_node["children"].append(_build_case_node(tc, tc_type))
             feat_node["children"].append(type_node)
         for tc_type, cases in by_feature[feature].items():
             if tc_type not in type_order:
                 type_node = {"title": f"{tc_type}用例", "children": []}
                 for tc in cases:
-                    name = tc.get("title") or tc.get("name", "")
-                    preconditions = tc.get("preconditions", "")
-                    steps = tc.get("steps", "")
-                    expected = tc.get("expected_result", tc.get("expected", ""))
-                    priority = tc.get("priority", "")
-                    node = {"title": name, "children": []}
-                    if preconditions or steps or expected:
-                        node["fields"] = {
-                            "preconditions": preconditions,
-                            "test_steps": steps,
-                            "expected_result": expected,
-                            "priority": priority,
-                        }
-                    if priority or tc_type:
-                        node["markers"] = _generate_markers(tc_type, priority)
-                    type_node["children"].append(node)
+                    type_node["children"].append(_build_case_node(tc, tc_type))
                 feat_node["children"].append(type_node)
         root_children.append(feat_node)
     grouping_node = {"title": root_title, "children": root_children}
@@ -289,7 +281,7 @@ def create_xmind_xmind8(
         zf.writestr("meta.xml", _create_meta_xml())
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate XMind test cases from JSON")
     parser.add_argument("--input", "-i", required=True, help="Path to testcases.json")
     parser.add_argument("--output", "-o", required=True, help="Output .xmind path")
@@ -299,13 +291,16 @@ def main():
     try:
         with open(args.input, encoding="utf-8-sig") as f:
             test_cases = json.load(f)
+    except FileNotFoundError:
+        logger.error("文件不存在: %s", args.input)
+        sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"错误：{args.input} JSON 格式无效（行 {e.lineno} 列 {e.colno}）。", file=sys.stderr)
-        print("常见原因：字符串值中包含未转义的双引号。请检查并将 \" 转义为 \\\" 或使用「」替代。", file=sys.stderr)
+        logger.error("%s JSON 格式无效（行 %s 列 %s）。", args.input, e.lineno, e.colno)
+        logger.error("常见原因：字符串值中包含未转义的双引号。请检查并将 \" 转义为 \\\" 或使用「」替代。")
         sys.exit(1)
 
     if not isinstance(test_cases, list):
-        print("错误：JSON 应为用例数组", file=sys.stderr)
+        logger.error("JSON 应为用例数组")
         sys.exit(1)
 
     structure = build_xmind_structure(test_cases, args.title)

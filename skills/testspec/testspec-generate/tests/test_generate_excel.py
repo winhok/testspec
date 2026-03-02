@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,8 +9,7 @@ from openpyxl import load_workbook
 
 
 def _venv_python() -> str:
-    repo_root = Path(__file__).resolve().parents[3]
-    return str(repo_root / ".venv" / "bin" / "python")
+    return sys.executable
 
 
 def _excel_script() -> str:
@@ -46,7 +46,8 @@ class TestGenerateExcel(unittest.TestCase):
                     str(input_path),
                     "--output",
                     str(output_path),
-                ]
+                ],
+                timeout=30,
             )
 
             wb = load_workbook(output_path, read_only=True, data_only=True)
@@ -98,7 +99,8 @@ class TestGenerateExcel(unittest.TestCase):
             input_path.write_text(json.dumps(testcases, ensure_ascii=False), encoding="utf-8")
 
             subprocess.check_call(
-                [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)]
+                [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)],
+                timeout=30,
             )
 
             wb = load_workbook(output_path, read_only=True, data_only=True)
@@ -118,7 +120,7 @@ class TestGenerateExcel(unittest.TestCase):
 
             result = subprocess.run(
                 [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)],
-                capture_output=True, text=True,
+                capture_output=True, text=True, timeout=30,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("JSON 格式无效", result.stderr)

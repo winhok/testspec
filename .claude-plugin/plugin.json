@@ -1,12 +1,12 @@
 {
-  "name": "testspec",
-  "version": "0.1.0",
-  "description": "TestSpec 测试用例设计工具集：需求分析、测试点提炼、用例生成",
+  "name": "testkit",
+  "version": "0.2.0",
+  "description": "TestKit 测试工具集：测试用例设计（testspec）+ API 文档转 JMX（api2jmx）",
   "author": {
     "name": "winhok"
   },
-  "homepage": "https://github.com/winhok/testspec",
-  "repository": "https://github.com/winhok/testspec",
+  "homepage": "https://github.com/winhok/testkit",
+  "repository": "https://github.com/winhok/testkit",
   "license": "MIT",
-  "keywords": ["testspec", "testing", "test-cases", "test-design", "qa"]
+  "keywords": ["testkit", "testspec", "jmx", "testing", "test-cases", "test-design", "jmeter", "qa"]
 }

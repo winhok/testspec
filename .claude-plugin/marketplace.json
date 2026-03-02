@@ -1,14 +1,14 @@
 {
-  "name": "testspec",
-  "description": "TestSpec 测试用例设计工具集",
+  "name": "testkit",
+  "description": "TestKit 测试工具集",
   "owner": {
     "name": "winhok"
   },
   "plugins": [
     {
-      "name": "testspec",
-      "description": "TestSpec 测试用例设计工具集：需求分析、测试点提炼、用例生成",
-      "version": "0.1.0",
+      "name": "testkit",
+      "description": "TestKit 测试工具集：测试用例设计（testspec）+ API 文档转 JMX（api2jmx）",
+      "version": "0.2.0",
       "source": "./",
       "author": {
         "name": "winhok"
