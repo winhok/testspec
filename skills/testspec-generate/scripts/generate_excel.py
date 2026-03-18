@@ -11,6 +11,11 @@ import logging
 import os
 import sys
 
+try:
+    from utils import configure_logging, load_and_validate_testcases
+except ImportError:
+    from .utils import configure_logging, load_and_validate_testcases
+
 logger = logging.getLogger(__name__)
 
 # 表头定义：(名称, 列宽)
@@ -82,26 +87,14 @@ def create_excel_with_openpyxl(test_cases: list, output_path: str) -> None:
 
 
 def main() -> None:
+    configure_logging()
+
     parser = argparse.ArgumentParser(description="Generate Excel test cases from JSON")
     parser.add_argument("--input", "-i", required=True, help="Path to testcases.json")
     parser.add_argument("--output", "-o", required=True, help="Output .xlsx path")
     args = parser.parse_args()
 
-    try:
-        with open(args.input, encoding="utf-8-sig") as f:
-            test_cases = json.load(f)
-    except FileNotFoundError:
-        logger.error("文件不存在: %s", args.input)
-        sys.exit(1)
-    except json.JSONDecodeError as e:
-        logger.error("%s JSON 格式无效（行 %s 列 %s）。", args.input, e.lineno, e.colno)
-        logger.error("常见原因：字符串值中包含未转义的双引号。请检查并将 \" 转义为 \\\" 或使用「」替代。")
-        sys.exit(1)
-
-    if not isinstance(test_cases, list):
-        logger.error("JSON 应为用例数组")
-        sys.exit(1)
-
+    test_cases = load_and_validate_testcases(args.input)
     create_excel_with_openpyxl(test_cases, args.output)
     print(f"已生成：{args.output}")
 

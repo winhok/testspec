@@ -1,6 +1,6 @@
 ---
 name: testspec-new
-description: TestSpec 新建测试工作（流程第 1 步：需求文档）- 创建一次测试变更目录并编写 proposal，关联需求文档。当用户要新建 TestSpec 测试工作、创建测试变更、或执行 testspec-new 时使用。创建 testspec/changes/<name>/ 及 proposal.md、specs/、artifacts/。
+description: TestSpec 新建测试工作（流程第 1 步）- 创建测试变更目录并编写 proposal.md，关联需求文档。当用户要「新建测试」「开始测试」「创建测试变更」「建一个测试项目」或执行 testspec-new / testspec new 时使用。也适用于用户说「我要测 XXX 功能」「帮我准备测试」「有个新需求要测」的场景——如果尚无 testspec/changes/ 目录，这是流程的起点。产出 testspec/changes/<name>/ 目录结构及 proposal.md。
 ---
 
 # testspec-new：新建测试工作（需求文档）

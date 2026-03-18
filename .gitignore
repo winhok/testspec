@@ -1,7 +1,40 @@
-
-.worktrees
+# Python
 __pycache__/
 *.pyc
-.DS_Store
+*.pyo
+*.egg-info/
+dist/
+build/
 .venv/
+
+# Caches
 .ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+
+# IDE / Editor
+.vscode/
+.idea/
+.cursor/
+.trae/
+
+# AI tools
+.claude/
+.serena/
+.omc/
+.worktrees/
+
+# Project-specific
+skills-workspace/
+testspec/

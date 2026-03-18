@@ -20,6 +20,11 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
+try:
+    from utils import configure_logging, load_and_validate_testcases
+except ImportError:
+    from .utils import configure_logging, load_and_validate_testcases
+
 logger = logging.getLogger(__name__)
 
 NS = "urn:xmind:xmap:xmlns:content:2.0"
@@ -283,27 +288,15 @@ def create_xmind_xmind8(
 
 
 def main() -> None:
+    configure_logging()
+
     parser = argparse.ArgumentParser(description="Generate XMind test cases from JSON")
     parser.add_argument("--input", "-i", required=True, help="Path to testcases.json")
     parser.add_argument("--output", "-o", required=True, help="Output .xmind path")
     parser.add_argument("--title", "-t", default="测试用例", help="Root topic / sheet title")
     args = parser.parse_args()
 
-    try:
-        with open(args.input, encoding="utf-8-sig") as f:
-            test_cases = json.load(f)
-    except FileNotFoundError:
-        logger.error("文件不存在: %s", args.input)
-        sys.exit(1)
-    except json.JSONDecodeError as e:
-        logger.error("%s JSON 格式无效（行 %s 列 %s）。", args.input, e.lineno, e.colno)
-        logger.error("常见原因：字符串值中包含未转义的双引号。请检查并将 \" 转义为 \\\" 或使用「」替代。")
-        sys.exit(1)
-
-    if not isinstance(test_cases, list):
-        logger.error("JSON 应为用例数组")
-        sys.exit(1)
-
+    test_cases = load_and_validate_testcases(args.input)
     structure = build_xmind_structure(test_cases, args.title)
     create_xmind_xmind8(structure, args.output, args.title, sheet_title=args.title)
     print(f"已生成：{args.output}")

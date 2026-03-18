@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -6,6 +7,10 @@ import unittest
 from pathlib import Path
 
 from openpyxl import load_workbook
+
+# Timeout for subprocess calls (seconds) - generous timeout for file generation
+# Can be overridden via TEST_SUBPROCESS_TIMEOUT environment variable
+SUBPROCESS_TIMEOUT = int(os.getenv('TEST_SUBPROCESS_TIMEOUT', '60'))
 
 
 def _venv_python() -> str:
@@ -47,7 +52,7 @@ class TestGenerateExcel(unittest.TestCase):
                     "--output",
                     str(output_path),
                 ],
-                timeout=30,
+                timeout=SUBPROCESS_TIMEOUT,
             )
 
             wb = load_workbook(output_path, read_only=True, data_only=True)
@@ -100,7 +105,7 @@ class TestGenerateExcel(unittest.TestCase):
 
             subprocess.check_call(
                 [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)],
-                timeout=30,
+                timeout=SUBPROCESS_TIMEOUT,
             )
 
             wb = load_workbook(output_path, read_only=True, data_only=True)
@@ -120,10 +125,48 @@ class TestGenerateExcel(unittest.TestCase):
 
             result = subprocess.run(
                 [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True, text=True, timeout=SUBPROCESS_TIMEOUT,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("JSON 格式无效", result.stderr)
+
+
+    def test_excel_schema_v2_with_tp_refs(self):
+        """v2 格式（对象包装）含 tp_refs 字段时正常生成 Excel。"""
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            input_path = td_path / "testcases.json"
+            output_path = td_path / "out.xlsx"
+
+            v2_data = {
+                "schema_version": 2,
+                "testcases": [
+                    {
+                        "id": "TC_LOGIN_001",
+                        "title": "登录_凭据验证_正确凭据登录成功",
+                        "feature": "登录",
+                        "type": "正向",
+                        "preconditions": "1、用户已注册",
+                        "steps": "1、打开登录页\n2、输入账号密码\n3、点击登录",
+                        "expected_result": "1、登录成功并跳转首页",
+                        "priority": "P1",
+                        "tp_refs": ["TP_LOGIN_CRED_001"],
+                    }
+                ],
+            }
+            input_path.write_text(json.dumps(v2_data, ensure_ascii=False), encoding="utf-8")
+
+            subprocess.check_call(
+                [_venv_python(), _excel_script(), "--input", str(input_path), "--output", str(output_path)],
+                timeout=SUBPROCESS_TIMEOUT,
+            )
+
+            wb = load_workbook(output_path, read_only=True, data_only=True)
+            ws = wb["测试用例"] if "测试用例" in wb.sheetnames else wb.active
+            self.assertEqual(ws.cell(row=2, column=1).value, "TC_LOGIN_001")
+            self.assertEqual(ws.cell(row=2, column=2).value, "登录_凭据验证_正确凭据登录成功")
+            self.assertEqual(ws.cell(row=2, column=3).value, "P1")
+            wb.close()
 
 
 if __name__ == "__main__":

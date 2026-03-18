@@ -13,11 +13,15 @@
 ## 流程概览
 
 ```
-testspec-new → testspec-analysis → testspec-points → testspec-generate
-  创建变更       需求深度分析         提炼测试要点       生成测试用例
+testspec-new → testspec-analysis → testspec-points → testspec-generate → testspec-review
+  创建变更       需求深度分析         提炼测试要点       生成测试用例        用例评审
 ```
 
 每个步骤的产物是下一步骤的输入。跳步执行时（如直接从 new 到 points），中间产物按默认策略生成。
+
+## 命名契约
+
+testspec-points 和 testspec-generate 共享命名规则，详见 `naming-contract.md`。
 
 ## 目录结构
 
@@ -25,9 +29,11 @@ testspec-new → testspec-analysis → testspec-points → testspec-generate
 testspec/changes/<name>/
 ├── proposal.md                # 测试提案（testspec-new）
 ├── requirements-analysis.md   # 需求分析（testspec-analysis）
+├── review-report.md           # 评审报告（testspec-review）
 ├── specs/
 │   └── testpoints.md          # 测试点（testspec-points）
 └── artifacts/
+    ├── testcases.json         # 测试用例 JSON（testspec-generate）
     ├── <name>_cases.xlsx      # 测试用例 Excel（testspec-generate）
     └── <name>_cases.xmind     # 测试用例 XMind（testspec-generate）
 ```

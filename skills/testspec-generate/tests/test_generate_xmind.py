@@ -1,10 +1,15 @@
 import json
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+
+# Timeout for subprocess calls (seconds) - generous timeout for file generation
+# Can be overridden via TEST_SUBPROCESS_TIMEOUT environment variable
+SUBPROCESS_TIMEOUT = int(os.getenv('TEST_SUBPROCESS_TIMEOUT', '60'))
 
 
 def _venv_python() -> str:
@@ -47,7 +52,7 @@ class TestGenerateXMind(unittest.TestCase):
                     "--title",
                     "测试用例",
                 ],
-                timeout=30,
+                timeout=SUBPROCESS_TIMEOUT,
             )
 
             with zipfile.ZipFile(output_path, "r") as zf:
@@ -79,7 +84,7 @@ class TestGenerateXMind(unittest.TestCase):
 
             subprocess.check_call(
                 [_venv_python(), _xmind_script(), "--input", str(input_path), "--output", str(output_path), "--title", "测试用例"],
-                timeout=30,
+                timeout=SUBPROCESS_TIMEOUT,
             )
 
             with zipfile.ZipFile(output_path, "r") as zf:
@@ -102,6 +107,51 @@ class TestGenerateXMind(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("JSON 格式无效", result.stderr)
+
+    def test_xmind_schema_v2_with_tp_refs(self):
+        """支持 schema v2 格式（对象包装器）并正确处理 tp_refs 字段。"""
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            input_path = td_path / "testcases.json"
+            output_path = td_path / "out.xmind"
+
+            testcases_v2 = {
+                "schema_version": 2,
+                "testcases": [
+                    {
+                        "id": "需求C_202603020001",
+                        "title": "登录_凭据验证_正确凭据登录成功",
+                        "feature": "登录",
+                        "type": "正向",
+                        "priority": "P1",
+                        "steps": "1、输入正确的用户名和密码",
+                        "expected_result": "1、登录成功并跳转到首页",
+                        "tp_refs": ["TP_LOGIN_CRED_001"],
+                    }
+                ],
+            }
+            input_path.write_text(json.dumps(testcases_v2, ensure_ascii=False), encoding="utf-8")
+
+            subprocess.check_call(
+                [
+                    _venv_python(),
+                    _xmind_script(),
+                    "--input",
+                    str(input_path),
+                    "--output",
+                    str(output_path),
+                    "--title",
+                    "测试用例",
+                ],
+                timeout=SUBPROCESS_TIMEOUT,
+            )
+
+            with zipfile.ZipFile(output_path, "r") as zf:
+                content = zf.read("content.xml").decode("utf-8")
+
+            self.assertIn("登录_凭据验证_正确凭据登录成功", content)
+            self.assertIn("P1操作步骤：", content)
+            self.assertIn("期望结果：", content)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 ---
 name: api2jmx
-description: API 文档转 JMX 工具 - 根据 API 接口文档（OpenAPI/Swagger 或 Markdown 格式）或自然语言输入（curl 命令、Raw HTTP 请求/响应、Postman Collection）自动生成 Apache JMeter 的 JMX 测试脚本。当用户需要为 REST API 创建 JMeter 性能测试脚本、从 API 文档生成 JMX 文件、或从 curl/HTTP/Postman 数据生成包含 HTTP 请求、断言、参数化的完整测试计划时使用。支持 OpenAPI 3.0 和 Swagger 2.0 格式、Markdown 格式的 API 文档、以及 curl/Raw HTTP/Postman 等自然语言输入，输出标准的 JMX XML 格式文件。
+description: API 文档转 JMX 工具 - 根据 API 接口文档或自然语言输入自动生成 Apache JMeter 的 JMX 测试脚本。当用户要「生成 JMX」「创建 JMeter 脚本」「API 性能测试」「压测脚本」或从 curl/Postman/Swagger/OpenAPI 生成测试计划时使用。也适用于用户说「帮我把这个接口做成压测脚本」「这几个 API 要做性能测试」「把 Postman 导出转成 JMeter」的场景。支持输入：OpenAPI 3.0/Swagger 2.0 (YAML/JSON)、Markdown API 文档、curl 命令、Raw HTTP 请求/响应、Postman Collection v2.1。输出标准 JMX XML 格式。
 ---
 
 # API 文档转 JMX 工具
@@ -295,18 +295,16 @@ xml = generator.generate_from_openapi("openapi.yaml")
 generator.save_jmx("api_test.jmx")
 ```
 
-### 示例 2：生成性能测试脚本
+### 示例 2：生成性能测试脚本（50 并发、30秒启动、5 次循环）
 
 ```python
-from scripts.generator import JmxGenerator
-
 generator = JmxGenerator()
 xml = generator.generate_from_openapi(
     "openapi.yaml",
     test_plan_name="Performance Test",
-    num_threads=50,  # 50 个并发用户
-    ramp_time=30,     # 30 秒启动
-    loops=5           # 每个用户执行 5 次
+    num_threads=50,
+    ramp_time=30,
+    loops=5
 )
 generator.save_jmx("performance_test.jmx")
 ```
@@ -314,8 +312,6 @@ generator.save_jmx("performance_test.jmx")
 ### 示例 3：从 Markdown 文档生成
 
 ```python
-from scripts.generator import JmxGenerator
-
 generator = JmxGenerator()
 xml = generator.generate_from_markdown("api_doc.md")
 generator.save_jmx("api_test.jmx")

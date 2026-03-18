@@ -9,8 +9,8 @@
 从需求分析到测试用例生成的完整流程。
 
 ```
-testspec-new → testspec-analysis → testspec-points → testspec-generate
-  创建变更       需求深度分析         提炼测试要点       生成测试用例
+testspec-new → testspec-analysis → testspec-points → testspec-generate → testspec-review
+  创建变更       需求深度分析         提炼测试要点       生成测试用例        用例评审
 ```
 
 | Skill | 说明 |
@@ -19,6 +19,7 @@ testspec-new → testspec-analysis → testspec-points → testspec-generate
 | testspec-analysis | 需求深度分析，识别测试风险和边界，产出 requirements-analysis.md |
 | testspec-points | 从分析结论中提炼测试点清单（specs/testpoints.md） |
 | testspec-generate | 根据测试点生成完整测试用例，导出 Excel（.xlsx）或 XMind（.xmind） |
+| testspec-review | 用例评审，对生成的测试用例做交叉验证，产出评审报告（review-report.md） |
 
 ### api2jmx - API 文档转 JMX 测试脚本
 
@@ -85,6 +86,8 @@ testspec-analysis
 testspec-points
 testspec-generate Excel
 testspec-generate XMind
+testspec-review
+testspec-review --deep
 ```
 
 ### api2jmx
